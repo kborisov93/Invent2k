@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Invent2k.Contexts;
 
 namespace Invent2k.Controllers
 {
@@ -39,6 +40,19 @@ namespace Invent2k.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        [HttpGet("user")]
+        public Object GetUser()
+            => User;
+
+        [HttpGet("mani")]
+        public Object Manipulation()
+        {
+            using (var ctx = new DataContext())
+            {
+                return ctx.Manipulations.Select(m => new { m.Id });
+            }
         }
     }
 }
