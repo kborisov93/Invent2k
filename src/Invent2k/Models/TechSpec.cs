@@ -18,7 +18,7 @@ namespace Invent2k.Models
         [Column("item_no")]
         public string ItemNo { get; set; }
 
-        public Item Item { get; set; }
+        public virtual Item Item { get; set; }
 
         [Required]
         [Column("parameter")]

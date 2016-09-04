@@ -33,9 +33,9 @@ namespace Invent2k.Models
         [MaxLength(10, ErrorMessage = "Кодът е твърде дълъг.")]
         public string ItemCategoryCode { get; set; }
 
-        public ItemCategory ItemCategory { get; set; }
+        public virtual ItemCategory ItemCategory { get; set; }
 
-        public ICollection<TechSpec> TechSpecs { get; set; } = new List<TechSpec>();
+        public virtual ICollection<TechSpec> TechSpecs { get; set; } = new List<TechSpec>();
 
         [Required]
         [Column("track_location")]

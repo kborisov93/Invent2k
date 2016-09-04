@@ -1,15 +1,18 @@
 ﻿using Invent2k.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Invent2k.Contexts
 {
+    [DbConfigurationType(typeof(EfConfig))]
     public class DataContext : DbContext
     {
+        public DataContext(string nameOrConnectionString) : base(nameOrConnectionString)
+        {
+        }
 
         public DbSet<ItemCategory> ItemCategories { get; set; }
         public DbSet<Item> Items { get; set; }
@@ -20,66 +23,43 @@ namespace Invent2k.Contexts
         public DbSet<Models.Attribute> Attributes { get; set; }
 
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            var connection = @"Server=(local);Database=Invent2k;Trusted_Connection=true;";
-            optionsBuilder.UseSqlServer(connection);
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Item>()
-                .Property(i => i.TrackLocation)
-                .HasDefaultValue(false);
-            modelBuilder.Entity<Item>()
-                .Property(i => i.TrackSerial)
-                .HasDefaultValue(false);
-            modelBuilder.Entity<Item>()
-                .Property(i => i.TrackLot)
-                .HasDefaultValue(false);
-            modelBuilder.Entity<Item>()
-                .HasMany<Manipulation>()
-                .WithOne(m => m.Item)
-                .HasForeignKey(m => m.ItemNo)
-                .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired();     
-
             modelBuilder.Entity<TechSpec>()
-                .HasOne(ts => ts.Item)
+                .HasRequired(ts => ts.Item)
                 .WithMany(i => i.TechSpecs)
-                .HasForeignKey(ts => ts.ItemNo)
-                .IsRequired();
+                .HasForeignKey(ts => ts.ItemNo);
+
+            modelBuilder.Entity<Item>()
+                .HasOptional(i => i.ItemCategory)
+                .WithMany()
+                .HasForeignKey(i => i.ItemCategoryCode);
 
             modelBuilder.Entity<Manipulation>()
-                .Property(m => m.Date)
-                .HasDefaultValue(DateTime.Today);
+                .HasRequired(m => m.Item)
+                .WithMany()
+                .HasForeignKey(m => m.ItemNo)
+                .WillCascadeOnDelete(false);
             modelBuilder.Entity<Manipulation>()
-                .HasOne(m => m.Location)
+                .HasOptional(m => m.Location)
                 .WithMany()
                 .HasForeignKey(m => m.LocationCode);
             modelBuilder.Entity<Manipulation>()
-                .HasOne(m => m.Reason)
+                .HasRequired(m => m.Reason)
                 .WithMany()
-                .HasForeignKey(m => m.ReasonCode)
-                .IsRequired();
+                .HasForeignKey(m => m.ReasonCode);
+            modelBuilder.Entity<Manipulation>()
+                .HasOptional(m => m.Attribute)
+                .WithMany()
+                .HasForeignKey(m => new { m.ItemNo, m.SerialNo })
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Models.Attribute>()
                 .HasKey(a => new { a.ItemNo, a.SerialNo });
             modelBuilder.Entity<Models.Attribute>()
-                .HasOne(a => a.Item)
+                .HasRequired(a => a.Item)
                 .WithMany()
                 .HasForeignKey(a => a.ItemNo);
-            modelBuilder.Entity<Models.Attribute>()
-                .HasMany<Manipulation>()
-                .WithOne(m => m.Attribute);
-            
-            modelBuilder.Entity<ItemCategory>()
-                .HasMany<Item>()
-                .WithOne(i => i.ItemCategory)
-                .HasForeignKey(i => i.ItemCategoryCode)
-                .OnDelete(DeleteBehavior.Restrict)
-                .IsRequired();
-
         }
     }
 }

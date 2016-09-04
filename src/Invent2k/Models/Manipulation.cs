@@ -26,7 +26,7 @@ namespace Invent2k.Models
         [Column("item_no")]
         public string ItemNo { get; set; }
 
-        public Item Item { get; set; }
+        public virtual Item Item { get; set; }
 
         [Required]
         [Column("unit_of_measure")]
@@ -48,15 +48,15 @@ namespace Invent2k.Models
         [Column("reason_code")]
         public string ReasonCode { get; set; }
 
-        public Reason Reason { get; set; }
+        public virtual Reason Reason { get; set; }
 
         [MaxLength(10)]
         [Column("location_code")]
         public string LocationCode { get; set; }
 
-        public Location Location { get; set; }
+        public virtual Location Location { get; set; }
 
-        public Attribute Attribute { get; set; }
+        public virtual Attribute Attribute { get; set; }
 
         [Required]
         [MaxLength(300)]

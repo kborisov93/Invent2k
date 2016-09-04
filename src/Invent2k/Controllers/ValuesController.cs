@@ -10,6 +10,14 @@ namespace Invent2k.Controllers
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+
+        private readonly DataContext db;
+
+        public ValuesController(DataContext dataContext)
+        {
+            db = dataContext;
+        }
+
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
@@ -49,10 +57,13 @@ namespace Invent2k.Controllers
         [HttpGet("mani")]
         public Object Manipulation()
         {
-            using (var ctx = new DataContext())
+            db.ItemCategories.Add(new Models.ItemCategory
             {
-                return ctx.Manipulations.Select(m => new { m.Id });
-            }
+                Code = "COMP",
+                Description = "Compove"
+            });
+            db.SaveChanges();
+            return db.Manipulations;
         }
     }
 }
